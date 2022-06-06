@@ -4,6 +4,8 @@ import {
   writeIcon,
   bookIcon,
   logoutIcon,
+  COLORS,
+  SIZES,
 } from "../helpers/constants";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
@@ -46,15 +48,23 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: "100%",
     height: 60,
-    backgroundColor: "#666",
+    backgroundColor: COLORS.dark,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
     borderTopRightRadius: 8,
     borderTopLeftRadius: 8,
   },
+  btn: {
+    shadowColor: COLORS.white,
+    shadowRadius: 5,
+    shadowOpacity: 1,
+  },
   img: {
     width: 30,
     height: 30,
+    shadowColor: COLORS.light,
+    shadowRadius: 1,
+    shadowOpacity: 0.5,
   },
 });

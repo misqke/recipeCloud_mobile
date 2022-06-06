@@ -11,6 +11,7 @@ const Screen = ({ children }) => {
         backgroundColor: COLORS.secondary,
         justifyContent: "center",
         alignItems: "center",
+        paddingBottom: 60,
       }}
     >
       {children}

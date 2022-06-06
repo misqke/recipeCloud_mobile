@@ -1,33 +1,75 @@
-import { View, Text, FlatList } from "react-native";
-import { Screen, RecipeCard } from "../components";
-import axios from "axios";
-import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { Screen, RecipeCard, Title } from "../components";
+import React, { useState, useEffect, useRef } from "react";
+import { getRecipes } from "../helpers/controllers";
+import { COLORS } from "../helpers/constants";
+
+const Pagination = ({ page, pages, press }) => {
+  return (
+    <View style={styles.paginationContainer}>
+      <TouchableOpacity onPress={() => press(-1)}>
+        <Text style={{ color: `${page > 1 ? COLORS.primary : COLORS.dark}` }}>
+          Prev
+        </Text>
+      </TouchableOpacity>
+
+      <Text>{`${page} / ${pages}`}</Text>
+
+      <TouchableOpacity onPress={() => press(1)}>
+        <Text
+          style={{ color: `${page < pages ? COLORS.primary : COLORS.dark}` }}
+        >
+          Next
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const Home = () => {
+  const listRef = useRef();
   const [recipes, setRecipes] = useState([]);
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
+
+  const handlePagePress = async (dir) => {
+    if ((dir === 1 && page === pages) || (dir === -1 && page === 1)) return;
+    const newRecipes = await getRecipes(page + dir);
+    setRecipes(newRecipes.recipes);
+    setPage((prev) => prev + dir);
+    listRef.current.scrollToOffset({ animated: true, offset: 0 });
+  };
 
   useEffect(() => {
-    const getRecipes = async () => {
-      try {
-        const { data } = await axios.get(
-          "https://misqke-recipe-cloud.herokuapp.com/api/recipes"
-        );
-        setRecipes(data.recipes);
-        console.log(data.recipes[0]);
-      } catch (error) {
-        console.log(error.message);
-      }
+    const getInitialRecipes = async () => {
+      const data = await getRecipes(1);
+      setRecipes(data.recipes);
+      setPages(data.pages);
     };
-    getRecipes();
+    getInitialRecipes();
   }, []);
 
   return (
     <Screen>
-      <Text>Home</Text>
+      <Title>Welcome Guest</Title>
       <FlatList
+        ref={listRef}
         data={recipes}
         renderItem={({ item }) => <RecipeCard recipe={item} />}
         keyExtractor={(item) => item._id}
+        numColumns={2}
+        ListHeaderComponent={
+          <Pagination page={page} pages={pages} press={handlePagePress} />
+        }
+        ListFooterComponent={
+          <Pagination page={page} pages={pages} press={handlePagePress} />
+        }
         style={{
           flex: 1,
           width: "100%",
@@ -38,3 +80,13 @@ const Home = () => {
 };
 
 export default Home;
+
+const styles = StyleSheet.create({
+  paginationContainer: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    marginVertical: 15,
+    marginBottom: 20,
+  },
+});
