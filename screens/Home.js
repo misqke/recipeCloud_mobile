@@ -55,6 +55,17 @@ const Home = () => {
     getInitialRecipes();
   }, []);
 
+  if (!recipes.length) {
+    return (
+      <Screen>
+        <Title>Welcome Guest</Title>
+        <View>
+          <Text>Loading recipes...</Text>
+        </View>
+      </Screen>
+    );
+  }
+
   return (
     <Screen>
       <Title>Welcome Guest</Title>

@@ -6,19 +6,23 @@ const Title = ({ children }) => {
   return (
     <View
       style={{
-        padding: SIZES.text,
-        paddingTop: SIZES.small,
+        padding: SIZES.small,
+        alignItems: "center",
+        justifyContent: "center",
         backgroundColor: COLORS.dark,
         width: "100%",
         borderBottomLeftRadius: 8,
         borderBottomRightRadius: 8,
+        position: "absolute",
+        top: 0,
       }}
     >
       <Text
         style={{
           fontFamily: FONTS.bold,
-          color: COLORS.primary,
+          color: COLORS.white,
           fontSize: SIZES.large,
+          letterSpacing: 1.5,
         }}
       >
         {children}

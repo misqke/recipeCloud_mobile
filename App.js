@@ -8,10 +8,44 @@ import RecipeBook from "./screens/RecipeBook";
 import AddRecipe from "./screens/AddRecipe";
 import EditRecipe from "./screens/EditRecipe";
 import { SafeAreaView, StatusBar } from "react-native";
-import { Page, Nav } from "./components";
+import { Nav } from "./components";
 import { COLORS } from "./helpers/constants";
+import { Provider } from "react-redux";
+import store from "./redux/store";
+import { useSelector } from "react-redux";
 
 const Stack = createNativeStackNavigator();
+
+const StackNav = () => {
+  const user = useSelector((state) => state.user);
+
+  return (
+    <SafeAreaView
+      style={{
+        flex: 1,
+        position: "relative",
+        backgroundColor: COLORS.dark,
+        justifyContent: "center",
+      }}
+    >
+      <StatusBar barStyle="light-content" />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {user.user === null ? (
+          <Stack.Screen name="login" component={Login} />
+        ) : (
+          <>
+            <Stack.Screen name="home" component={Home} />
+            <Stack.Screen name="recipe" component={Recipe} />
+            <Stack.Screen name="recipeBook" component={RecipeBook} />
+            <Stack.Screen name="addRecipe" component={AddRecipe} />
+            <Stack.Screen name="editRecipe" component={EditRecipe} />
+          </>
+        )}
+      </Stack.Navigator>
+      <Nav />
+    </SafeAreaView>
+  );
+};
 
 export default function App() {
   const [loaded] = useFonts({
@@ -22,29 +56,9 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <SafeAreaView
-        style={{
-          flex: 1,
-          position: "relative",
-          backgroundColor: COLORS.dark,
-          // alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <StatusBar barStyle="light-content" />
-        <Stack.Navigator
-          initialRouteName="home"
-          screenOptions={{ headerShown: false }}
-        >
-          <Stack.Screen name="home" component={Home} />
-          <Stack.Screen name="login" component={Login} />
-          <Stack.Screen name="recipe" component={Recipe} />
-          <Stack.Screen name="recipeBook" component={RecipeBook} />
-          <Stack.Screen name="addRecipe" component={AddRecipe} />
-          <Stack.Screen name="editRecipe" component={EditRecipe} />
-        </Stack.Navigator>
-        <Nav />
-      </SafeAreaView>
+      <Provider store={store}>
+        <StackNav />
+      </Provider>
     </NavigationContainer>
   );
 }

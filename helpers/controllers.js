@@ -6,3 +6,15 @@ export const getRecipes = async (page = 1, search = "") => {
   );
   return data;
 };
+
+export const logIn = async (user) => {
+  try {
+    const { data } = await axios.post(
+      `https://misqke-recipe-cloud.herokuapp.com/api/auth/login`,
+      user
+    );
+    return data;
+  } catch (error) {
+    return { error: error.response.data.error };
+  }
+};

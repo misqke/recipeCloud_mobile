@@ -9,9 +9,9 @@ const Screen = ({ children }) => {
         flex: 1,
         position: "relative",
         backgroundColor: COLORS.secondary,
-        justifyContent: "center",
         alignItems: "center",
-        paddingBottom: 60,
+        justifyContent: "center",
+        paddingVertical: 60,
       }}
     >
       {children}
