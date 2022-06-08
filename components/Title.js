@@ -15,6 +15,7 @@ const Title = ({ children }) => {
         borderBottomRightRadius: 8,
         position: "absolute",
         top: 0,
+        zIndex: 10,
       }}
     >
       <Text

@@ -12,12 +12,26 @@ import { Nav } from "./components";
 import { COLORS } from "./helpers/constants";
 import { Provider } from "react-redux";
 import store from "./redux/store";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setUser } from "./redux/userSlice";
+import { useEffect } from "react";
+import { checkUser } from "./helpers/controllers";
 
 const Stack = createNativeStackNavigator();
 
 const StackNav = () => {
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+    const checkForUser = async () => {
+      const results = await checkUser();
+      if (results !== null) {
+        dispatch(setUser(results.user));
+      }
+    };
+    checkForUser();
+  }, []);
 
   return (
     <SafeAreaView
@@ -30,9 +44,7 @@ const StackNav = () => {
     >
       <StatusBar barStyle="light-content" />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {user.user === null ? (
-          <Stack.Screen name="login" component={Login} />
-        ) : (
+        {user.username !== null ? (
           <>
             <Stack.Screen name="home" component={Home} />
             <Stack.Screen name="recipe" component={Recipe} />
@@ -40,6 +52,8 @@ const StackNav = () => {
             <Stack.Screen name="addRecipe" component={AddRecipe} />
             <Stack.Screen name="editRecipe" component={EditRecipe} />
           </>
+        ) : (
+          <Stack.Screen name="login" component={Login} />
         )}
       </Stack.Navigator>
       <Nav />
@@ -50,6 +64,7 @@ const StackNav = () => {
 export default function App() {
   const [loaded] = useFonts({
     marker: require("./assets/fonts/PermanentMarker-Regular.ttf"),
+    pen: require("./assets/fonts/ShadowsIntoLightTwo-Regular.ttf"),
   });
 
   if (!loaded) return null;

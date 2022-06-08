@@ -15,6 +15,7 @@ const COLORS = {
 
 const FONTS = {
   bold: "marker",
+  pen: "pen",
 };
 
 const SIZES = {

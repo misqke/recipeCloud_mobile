@@ -9,6 +9,7 @@ import { Screen, RecipeCard, Title } from "../components";
 import React, { useState, useEffect, useRef } from "react";
 import { getRecipes } from "../helpers/controllers";
 import { COLORS } from "../helpers/constants";
+import { useSelector } from "react-redux";
 
 const Pagination = ({ page, pages, press }) => {
   return (
@@ -34,6 +35,7 @@ const Pagination = ({ page, pages, press }) => {
 
 const Home = () => {
   const listRef = useRef();
+  const user = useSelector((state) => state.user);
   const [recipes, setRecipes] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
@@ -58,7 +60,9 @@ const Home = () => {
   if (!recipes.length) {
     return (
       <Screen>
-        <Title>Welcome Guest</Title>
+        <Title>
+          Welcome {user.username !== null ? `${user.username}` : "Guest"}
+        </Title>
         <View>
           <Text>Loading recipes...</Text>
         </View>
@@ -68,7 +72,9 @@ const Home = () => {
 
   return (
     <Screen>
-      <Title>Welcome Guest</Title>
+      <Title>
+        Welcome {user.username !== null ? `${user.username}` : "Guest"}
+      </Title>
       <FlatList
         ref={listRef}
         data={recipes}

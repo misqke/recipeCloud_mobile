@@ -1,10 +1,22 @@
-import { View, Text, StyleSheet, Image, ImageBackground } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ImageBackground,
+  Pressable,
+} from "react-native";
 import { foodPlaceholder, COLORS, FONTS, SIZES } from "../helpers/constants";
 import React from "react";
+import { useNavigation } from "@react-navigation/native";
 
 const RecipeCard = ({ recipe }) => {
+  const navigation = useNavigation();
   return (
-    <View style={styles.container}>
+    <Pressable
+      style={styles.container}
+      onPress={() => navigation.navigate("recipe", recipe)}
+    >
       <ImageBackground
         source={
           recipe.image.url === "/food-placeholder.png"
@@ -18,7 +30,7 @@ const RecipeCard = ({ recipe }) => {
         <Text style={styles.contentTitle}>{recipe.name}</Text>
         <Text style={styles.contentAuthor}>{recipe.createdBy}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

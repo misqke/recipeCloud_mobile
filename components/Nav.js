@@ -9,9 +9,19 @@ import {
 } from "../helpers/constants";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "../redux/userSlice";
+import { logout } from "../helpers/controllers";
 
 const Nav = () => {
+  const user = useSelector((state) => state.user);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  const handleLogoutPress = async () => {
+    dispatch(logoutUser());
+    await logout();
+  };
 
   return (
     <View style={styles.container}>
@@ -23,7 +33,7 @@ const Nav = () => {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.btn}
-        onPress={() => navigation.navigate("recipeBook")}
+        onPress={() => navigation.navigate("recipeBook", user.username)}
       >
         <Image source={bookIcon} resizeMode="contain" style={styles.img} />
       </TouchableOpacity>
@@ -33,7 +43,7 @@ const Nav = () => {
       >
         <Image source={writeIcon} resizeMode="contain" style={styles.img} />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.btn}>
+      <TouchableOpacity style={styles.btn} onPress={() => handleLogoutPress()}>
         <Image source={logoutIcon} resizeMode="contain" style={styles.img} />
       </TouchableOpacity>
     </View>

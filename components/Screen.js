@@ -6,12 +6,15 @@ const Screen = ({ children }) => {
   return (
     <View
       style={{
-        flex: 1,
         position: "relative",
         backgroundColor: COLORS.secondary,
+        flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        paddingVertical: 60,
+        width: "100%",
+        height: "100%",
+        paddingTop: 60,
+        paddingBottom: 60,
       }}
     >
       {children}

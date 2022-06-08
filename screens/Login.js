@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { Screen, Title, Message } from "../components";
 import { COLORS, SIZES, FONTS } from "../helpers/constants";
@@ -33,12 +34,13 @@ const Login = () => {
     } else if (!password || !password.length) {
       setMessage({ error: true, msg: "Password is required" });
     }
-    const data = await logIn({ username, password });
-    if (data.error) {
+    const { token, user, error } = await logIn({ username, password });
+    if (error) {
+      console.log(error);
       setMessage({ error: true, msg: data.error });
       return;
     }
-    dispatch(setUser(data));
+    dispatch(setUser(user));
   };
 
   return (
@@ -47,32 +49,42 @@ const Login = () => {
       {message.msg.length > 0 && (
         <Message error={message.error}>{message.msg}</Message>
       )}
-      <View style={styles.form}>
-        <View style={styles.formControl}>
-          <Text style={styles.formLabel}>Username</Text>
-          <TextInput
-            style={styles.formInput}
-            value={username}
-            onChangeText={(text) => handleInputChange(text, "username")}
-          />
+      <ScrollView
+        style={styles.formContainer}
+        contentContainerStyle={{
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+          width: "100%",
+        }}
+      >
+        <View style={styles.form}>
+          <View style={styles.formControl}>
+            <Text style={styles.formLabel}>Username</Text>
+            <TextInput
+              style={styles.formInput}
+              value={username}
+              onChangeText={(text) => handleInputChange(text, "username")}
+            />
+          </View>
+          <View style={styles.formControl}>
+            <Text style={styles.formLabel}>Password</Text>
+            <TextInput
+              style={styles.formInput}
+              value={password}
+              onChangeText={(text) => handleInputChange(text, "password")}
+              type="password"
+              secureTextEntry={true}
+            />
+          </View>
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={() => handleLoginPress(username, password)}
+          >
+            <Text style={styles.formLabel}>Log in</Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.formControl}>
-          <Text style={styles.formLabel}>Password</Text>
-          <TextInput
-            style={styles.formInput}
-            value={password}
-            onChangeText={(text) => handleInputChange(text, "password")}
-            type="password"
-            secureTextEntry={true}
-          />
-        </View>
-        <TouchableOpacity
-          style={styles.btn}
-          onPress={() => handleLoginPress(username, password)}
-        >
-          <Text style={styles.formLabel}>Log in</Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
     </Screen>
   );
 };
@@ -82,14 +94,16 @@ export default Login;
 const styles = StyleSheet.create({
   form: {
     backgroundColor: COLORS.dark,
-    justifyContent: "center",
     borderStyle: "solid",
     borderWidth: 1,
     paddingVertical: 40,
     borderRadius: SIZES.small,
     width: "75%",
-    maxWidth: 400,
+    maxWidth: 450,
     alignItems: "center",
+  },
+  formContainer: {
+    width: "100%",
   },
   formControl: {
     marginVertical: 10,
