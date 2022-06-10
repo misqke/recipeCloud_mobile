@@ -7,28 +7,34 @@ import Recipe from "./screens/Recipe";
 import RecipeBook from "./screens/RecipeBook";
 import AddRecipe from "./screens/AddRecipe";
 import EditRecipe from "./screens/EditRecipe";
-import { SafeAreaView, StatusBar } from "react-native";
+import { SafeAreaView, StatusBar, ActivityIndicator } from "react-native";
 import { Nav } from "./components";
 import { COLORS } from "./helpers/constants";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 import { useSelector, useDispatch } from "react-redux";
 import { setUser } from "./redux/userSlice";
-import { useEffect } from "react";
-import { checkUser } from "./helpers/controllers";
+import { useEffect, useState } from "react";
+import { checkUser, logIn } from "./helpers/controllers";
 
 const Stack = createNativeStackNavigator();
 
 const StackNav = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkForUser = async () => {
       const results = await checkUser();
       if (results !== null) {
-        dispatch(setUser(results.user));
+        const { token, user } = await logIn({
+          username: results.username,
+          password: results.password,
+        });
+        dispatch(setUser({ token, ...user }));
       }
+      setLoading(false);
     };
     checkForUser();
   }, []);
@@ -42,21 +48,27 @@ const StackNav = () => {
         justifyContent: "center",
       }}
     >
-      <StatusBar barStyle="light-content" />
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {user.username !== null ? (
-          <>
-            <Stack.Screen name="home" component={Home} />
-            <Stack.Screen name="recipe" component={Recipe} />
-            <Stack.Screen name="recipeBook" component={RecipeBook} />
-            <Stack.Screen name="addRecipe" component={AddRecipe} />
-            <Stack.Screen name="editRecipe" component={EditRecipe} />
-          </>
-        ) : (
-          <Stack.Screen name="login" component={Login} />
-        )}
-      </Stack.Navigator>
-      <Nav />
+      {loading ? (
+        <ActivityIndicator />
+      ) : (
+        <>
+          <StatusBar barStyle="light-content" />
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            {user.username !== null ? (
+              <>
+                <Stack.Screen name="home" component={Home} />
+                <Stack.Screen name="recipe" component={Recipe} />
+                <Stack.Screen name="recipeBook" component={RecipeBook} />
+                <Stack.Screen name="addRecipe" component={AddRecipe} />
+                <Stack.Screen name="editRecipe" component={EditRecipe} />
+              </>
+            ) : (
+              <Stack.Screen name="login" component={Login} />
+            )}
+          </Stack.Navigator>
+          {user.username !== null && <Nav />}
+        </>
+      )}
     </SafeAreaView>
   );
 };

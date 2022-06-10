@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Screen, Title, Message } from "../components";
 import { COLORS, SIZES, FONTS } from "../helpers/constants";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { logIn } from "../helpers/controllers";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/userSlice";
@@ -40,7 +40,7 @@ const Login = () => {
       setMessage({ error: true, msg: data.error });
       return;
     }
-    dispatch(setUser(user));
+    dispatch(setUser({ token, ...user }));
   };
 
   return (

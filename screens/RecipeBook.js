@@ -2,7 +2,7 @@ import { View, Text, FlatList } from "react-native";
 import { Screen, RecipeCard, Title } from "../components";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { getBookRecipes } from "../helpers/controllers";
+import { getBookRecipes, getLikedRecipes } from "../helpers/controllers";
 
 const RecipeBook = ({ route }) => {
   const user = useSelector((state) => state.user);
@@ -12,7 +12,12 @@ const RecipeBook = ({ route }) => {
   useEffect(() => {
     const getRecipes = async () => {
       const bookRecipes = await getBookRecipes(author, user.username);
-      setRecipes(bookRecipes);
+      if (author === user.username) {
+        const data = await getLikedRecipes(user._id);
+        setRecipes([...bookRecipes, ...data]);
+      } else {
+        setRecipes(bookRecipes);
+      }
     };
     getRecipes();
   }, [author, user]);

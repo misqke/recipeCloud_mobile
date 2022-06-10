@@ -23,7 +23,8 @@ const Title = ({ children }) => {
           fontFamily: FONTS.bold,
           color: COLORS.white,
           fontSize: SIZES.large,
-          letterSpacing: 1.5,
+          lineHeight: SIZES.large,
+          letterSpacing: 1.25,
         }}
       >
         {children}

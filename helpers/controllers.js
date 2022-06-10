@@ -2,25 +2,31 @@ import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
 export const checkUser = async () => {
-  let jsonUser = await SecureStore.getItemAsync("user");
-  let jsonToken = await SecureStore.getItemAsync("token");
-  let jsonLikes = await SecureStore.getItemAsync("likes");
-  const user = JSON.parse(jsonUser);
-  const token = JSON.parse(jsonToken);
-  const likes = JSON.parse(jsonLikes);
-  return user ? { user, token, likes } : null;
+  try {
+    let jsonUsername = await SecureStore.getItemAsync("username");
+    let jsonPassword = await SecureStore.getItemAsync("password");
+
+    const username = JSON.parse(jsonUsername);
+    const password = JSON.parse(jsonPassword);
+
+    return username ? { username, password } : null;
+  } catch (error) {
+    return null;
+  }
 };
 
-export const setUser = async (data) => {
-  await SecureStore.setItemAsync("user", JSON.stringify(data.user));
-  await SecureStore.setItemAsync("token", JSON.stringify(data.token));
-  await SecureStore.setItemAsync("likes", JSON.stringify(data.likes));
+export const setUser = async (user) => {
+  try {
+    await SecureStore.setItemAsync("username", JSON.stringify(user.username));
+    await SecureStore.setItemAsync("password", JSON.stringify(user.password));
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const logout = async () => {
-  await SecureStore.setItemAsync("user", JSON.stringify(null));
-  await SecureStore.setItemAsync("token", JSON.stringify(null));
-  await SecureStore.setItemAsync("likes", JSON.stringify(null));
+  await SecureStore.setItemAsync("username", JSON.stringify(null));
+  await SecureStore.setItemAsync("password", JSON.stringify(null));
 };
 
 export const getRecipes = async (page = 1, search = "") => {
@@ -43,9 +49,34 @@ export const logIn = async (user) => {
       `https://misqke-recipe-cloud.herokuapp.com/api/auth/login`,
       user
     );
-    setUser(data);
+    await setUser(user);
     return data;
   } catch (error) {
+    console.log(error);
+    return { error: error.response.data.error };
+  }
+};
+
+export const getLikedRecipes = async (userId) => {
+  const { data } = await axios.get(
+    `https://misqke-recipe-cloud.herokuapp.com/api/recipes/likes/?id=${userId}`
+  );
+  return data.recipes;
+};
+
+export const toggleLike = async (id, token) => {
+  try {
+    const { data } = await axios.get(
+      `https://misqke-recipe-cloud.herokuapp.com/api/recipes/${id}/like`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return data.user.liked_recipes;
+  } catch (error) {
+    console.log(error);
     return { error: error.response.data.error };
   }
 };

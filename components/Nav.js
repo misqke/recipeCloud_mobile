@@ -1,12 +1,6 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
-import {
-  homeIcon,
-  writeIcon,
-  bookIcon,
-  logoutIcon,
-  COLORS,
-  SIZES,
-} from "../helpers/constants";
+import { COLORS, SIZES } from "../helpers/constants";
+import Icon from "./Icon";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,22 +23,22 @@ const Nav = () => {
         style={styles.btn}
         onPress={() => navigation.navigate("home")}
       >
-        <Image source={homeIcon} resizeMode="contain" style={styles.img} />
+        <Icon name="home" color={COLORS.secondary} size={SIZES.large} />
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.btn}
         onPress={() => navigation.navigate("recipeBook", user.username)}
       >
-        <Image source={bookIcon} resizeMode="contain" style={styles.img} />
+        <Icon name="book" color={COLORS.secondary} size={SIZES.large} />
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.btn}
         onPress={() => navigation.navigate("addRecipe")}
       >
-        <Image source={writeIcon} resizeMode="contain" style={styles.img} />
+        <Icon name="document" color={COLORS.secondary} size={SIZES.large} />
       </TouchableOpacity>
       <TouchableOpacity style={styles.btn} onPress={() => handleLogoutPress()}>
-        <Image source={logoutIcon} resizeMode="contain" style={styles.img} />
+        <Icon name="log-out" color={COLORS.secondary} size={SIZES.large} />
       </TouchableOpacity>
     </View>
   );
@@ -66,15 +60,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 8,
   },
   btn: {
-    shadowColor: COLORS.white,
+    shadowColor: COLORS.primary,
     shadowRadius: 5,
-    shadowOpacity: 1,
-  },
-  img: {
-    width: 30,
-    height: 30,
-    shadowColor: COLORS.light,
-    shadowRadius: 1,
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.75,
   },
 });

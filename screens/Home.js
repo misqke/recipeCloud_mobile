@@ -4,12 +4,34 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  TextInput,
 } from "react-native";
-import { Screen, RecipeCard, Title } from "../components";
+import { Screen, RecipeCard, Title, Icon } from "../components";
 import React, { useState, useEffect, useRef } from "react";
 import { getRecipes } from "../helpers/controllers";
-import { COLORS } from "../helpers/constants";
+import { COLORS, SIZES } from "../helpers/constants";
 import { useSelector } from "react-redux";
+
+const SearchBar = ({ func }) => {
+  const [search, setSearch] = useState("");
+
+  return (
+    <View style={styles.searchBar}>
+      <TextInput
+        style={styles.searchInput}
+        value={search}
+        clearButtonMode="always"
+        onChangeText={(text) => setSearch(text)}
+        onEndEditing={() => {
+          func(search);
+        }}
+      />
+      <View style={styles.searchIcon}>
+        <Icon name="search" color={COLORS.gray} size={SIZES.medium} />
+      </View>
+    </View>
+  );
+};
 
 const Pagination = ({ page, pages, press }) => {
   return (
@@ -48,6 +70,13 @@ const Home = () => {
     listRef.current.scrollToOffset({ animated: true, offset: 0 });
   };
 
+  const handleSearch = async (search) => {
+    const data = await getRecipes(1, search);
+    setRecipes(data.recipes);
+    setPage(1);
+    setPages(data.pages);
+  };
+
   useEffect(() => {
     const getInitialRecipes = async () => {
       const data = await getRecipes(1);
@@ -81,9 +110,7 @@ const Home = () => {
         renderItem={({ item }) => <RecipeCard recipe={item} />}
         keyExtractor={(item) => item._id}
         numColumns={2}
-        ListHeaderComponent={
-          <Pagination page={page} pages={pages} press={handlePagePress} />
-        }
+        ListHeaderComponent={<SearchBar func={handleSearch} />}
         ListFooterComponent={
           <Pagination page={page} pages={pages} press={handlePagePress} />
         }
@@ -103,7 +130,28 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-evenly",
-    marginVertical: 15,
-    marginBottom: 20,
+    marginVertical: 10,
+  },
+  searchBar: {
+    width: "100%",
+    alignItems: "center",
+    position: "relative",
+  },
+  searchInput: {
+    width: "80%",
+    backgroundColor: COLORS.white,
+    fontSize: SIZES.text,
+    padding: 6,
+    paddingLeft: "8%",
+    borderRadius: 8,
+    borderColor: COLORS.dark,
+    borderWidth: 1,
+    borderStyle: "solid",
+  },
+  searchIcon: {
+    position: "absolute",
+    left: "12%",
+    top: "50%",
+    transform: [{ translateY: -SIZES.medium / 2 }],
   },
 });
