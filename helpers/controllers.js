@@ -1,6 +1,28 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
+// handle auth
+export const logIn = async (user) => {
+  try {
+    const { data } = await axios.post(
+      `https://misqke-recipe-cloud.herokuapp.com/api/auth/login`,
+      user
+    );
+    await setUser(user);
+    return data;
+  } catch (error) {
+    console.log(error);
+    return { error: error.response.data.error };
+  }
+};
+
+export const logout = async () => {
+  await axios.get("https://misqke-recipe-cloud.herokuapp.com/api/auth/logout");
+  await SecureStore.setItemAsync("username", JSON.stringify(null));
+  await SecureStore.setItemAsync("password", JSON.stringify(null));
+};
+
+// handle secure storage
 export const checkUser = async () => {
   try {
     let jsonUsername = await SecureStore.getItemAsync("username");
@@ -24,11 +46,7 @@ export const setUser = async (user) => {
   }
 };
 
-export const logout = async () => {
-  await SecureStore.setItemAsync("username", JSON.stringify(null));
-  await SecureStore.setItemAsync("password", JSON.stringify(null));
-};
-
+// handle recipes
 export const getRecipes = async (page = 1, search = "") => {
   const { data } = await axios.get(
     `https://misqke-recipe-cloud.herokuapp.com/api/recipes/?page=${page}&limit=8&search=${search}`
@@ -43,20 +61,6 @@ export const getBookRecipes = async (author, viewer) => {
   return data.recipes;
 };
 
-export const logIn = async (user) => {
-  try {
-    const { data } = await axios.post(
-      `https://misqke-recipe-cloud.herokuapp.com/api/auth/login`,
-      user
-    );
-    await setUser(user);
-    return data;
-  } catch (error) {
-    console.log(error);
-    return { error: error.response.data.error };
-  }
-};
-
 export const getLikedRecipes = async (userId) => {
   const { data } = await axios.get(
     `https://misqke-recipe-cloud.herokuapp.com/api/recipes/likes/?id=${userId}`
@@ -64,10 +68,11 @@ export const getLikedRecipes = async (userId) => {
   return data.recipes;
 };
 
-export const toggleLike = async (id, token) => {
+// handle likes
+export const toggleLike = async (recipeId, token) => {
   try {
     const { data } = await axios.get(
-      `https://misqke-recipe-cloud.herokuapp.com/api/recipes/${id}/like`,
+      `https://misqke-recipe-cloud.herokuapp.com/api/recipes/${recipeId}/like`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -78,5 +83,40 @@ export const toggleLike = async (id, token) => {
   } catch (error) {
     console.log(error);
     return { error: error.response.data.error };
+  }
+};
+
+// handle comments
+export const addComment = async (recipeId, comment, token) => {
+  try {
+    const { data } = await axios.patch(
+      `https://misqke-recipe-cloud.herokuapp.com/api/recipes/${recipeId}/comment`,
+      { comment },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (data.recipe) {
+      return data.recipe;
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deleteComment = async (recipeId, index, token) => {
+  try {
+    const { data } = await axios.patch(
+      `https://misqke-recipe-cloud.herokuapp.com/api/recipes/${recipeId}/comment/delete`,
+      { index },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (data.recipe) {
+      return data.recipe;
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.log(error);
   }
 };

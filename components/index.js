@@ -4,5 +4,6 @@ import RecipeCard from "./RecipeCard";
 import Title from "./Title";
 import Message from "./Message";
 import Icon from "./Icon";
+import RecipeForm from "./RecipeForm";
 
-export { Screen, Nav, RecipeCard, Title, Message, Icon };
+export { Screen, Nav, RecipeCard, Title, Message, Icon, RecipeForm };
