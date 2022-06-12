@@ -6,7 +6,7 @@ const AddRecipe = () => {
   return (
     <Screen>
       <Title>New Recipe</Title>
-      <Text>AddRecipe</Text>
+      <RecipeForm recipe={{}} />
     </Screen>
   );
 };
