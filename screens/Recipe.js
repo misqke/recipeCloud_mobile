@@ -83,7 +83,7 @@ const Recipe = ({ route, navigation }) => {
   const scrollRef = useRef(null);
   let recipe = route.params;
   const user = useSelector((state) => state.user);
-  const [comments, setComments] = useState(recipe.comments);
+  const [comments, setComments] = useState(recipe?.comments || []);
   const [isAuthor, setIsAuthor] = useState(false);
   const [showCommentBox, setShowCommentBox] = useState(false);
 

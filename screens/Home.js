@@ -107,6 +107,8 @@ const Home = () => {
       <FlatList
         ref={listRef}
         data={recipes}
+        refreshing={false}
+        onRefresh={() => handleSearch()}
         renderItem={({ item }) => <RecipeCard recipe={item} />}
         keyExtractor={(item) => item._id}
         numColumns={2}

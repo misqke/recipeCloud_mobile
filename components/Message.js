@@ -13,6 +13,7 @@ const Message = ({ children, error = false }) => {
         padding: 10,
         justifyContent: "center",
         alignItems: "center",
+        zIndex: 10,
       }}
     >
       <Text

@@ -8,7 +8,11 @@ export const logIn = async (user) => {
       `https://misqke-recipe-cloud.herokuapp.com/api/auth/login`,
       user
     );
-    await setUser(user);
+    await setUser({
+      username: user.username,
+      password: user.password,
+      token: data.token,
+    });
     return data;
   } catch (error) {
     console.log(error);
@@ -20,6 +24,7 @@ export const logout = async () => {
   await axios.get("https://misqke-recipe-cloud.herokuapp.com/api/auth/logout");
   await SecureStore.setItemAsync("username", JSON.stringify(null));
   await SecureStore.setItemAsync("password", JSON.stringify(null));
+  await SecureStore.setItemAsync("token", JSON.stringify(null));
 };
 
 // handle secure storage
@@ -41,12 +46,13 @@ export const setUser = async (user) => {
   try {
     await SecureStore.setItemAsync("username", JSON.stringify(user.username));
     await SecureStore.setItemAsync("password", JSON.stringify(user.password));
+    await SecureStore.setItemAsync("token", JSON.stringify(user.token));
   } catch (error) {
     console.log(error);
   }
 };
 
-// handle recipes
+// handle getting recipes
 export const getRecipes = async (page = 1, search = "") => {
   const { data } = await axios.get(
     `https://misqke-recipe-cloud.herokuapp.com/api/recipes/?page=${page}&limit=8&search=${search}`
@@ -69,8 +75,10 @@ export const getLikedRecipes = async (userId) => {
 };
 
 // handle likes
-export const toggleLike = async (recipeId, token) => {
+export const toggleLike = async (recipeId) => {
   try {
+    const jsonToken = await SecureStore.getItemAsync("token");
+    const token = JSON.parse(jsonToken);
     const { data } = await axios.get(
       `https://misqke-recipe-cloud.herokuapp.com/api/recipes/${recipeId}/like`,
       {
@@ -87,8 +95,10 @@ export const toggleLike = async (recipeId, token) => {
 };
 
 // handle comments
-export const addComment = async (recipeId, comment, token) => {
+export const addComment = async (recipeId, comment) => {
   try {
+    const jsonToken = await SecureStore.getItemAsync("token");
+    const token = JSON.parse(jsonToken);
     const { data } = await axios.patch(
       `https://misqke-recipe-cloud.herokuapp.com/api/recipes/${recipeId}/comment`,
       { comment },
@@ -104,8 +114,10 @@ export const addComment = async (recipeId, comment, token) => {
   }
 };
 
-export const deleteComment = async (recipeId, index, token) => {
+export const deleteComment = async (recipeId, index) => {
   try {
+    const jsonToken = await SecureStore.getItemAsync("token");
+    const token = JSON.parse(jsonToken);
     const { data } = await axios.patch(
       `https://misqke-recipe-cloud.herokuapp.com/api/recipes/${recipeId}/comment/delete`,
       { index },
@@ -116,6 +128,38 @@ export const deleteComment = async (recipeId, index, token) => {
     } else {
       return data;
     }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// add or update recipes
+export const addRecipe = async (recipe) => {
+  try {
+    const jsonToken = await SecureStore.getItemAsync("token");
+    const token = JSON.parse(jsonToken);
+    const { data } = await axios.post(
+      `https://misqke-recipe-cloud.herokuapp.com/api/recipes`,
+      recipe,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return data.recipe;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const updateRecipe = async (recipe) => {
+  try {
+    const jsonToken = await SecureStore.getItemAsync("token");
+    const token = JSON.parse(jsonToken);
+    const id = recipe._id;
+    const { data } = await axios.patch(
+      `https://misqke-recipe-cloud.herokuapp.com/api/recipes/${id}`,
+      recipe,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return data.recipe;
   } catch (error) {
     console.log(error);
   }
