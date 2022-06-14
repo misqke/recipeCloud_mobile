@@ -1,4 +1,10 @@
-import { FlatList, useWindowDimensions, View, Text } from "react-native";
+import {
+  FlatList,
+  useWindowDimensions,
+  View,
+  Text,
+  ActivityIndicator,
+} from "react-native";
 import { Screen, RecipeCard, Title } from "../components";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -11,6 +17,7 @@ const RecipeBook = ({ route }) => {
   const author = route.params;
   const [recipes, setRecipes] = useState([]);
   const { width, height } = useWindowDimensions();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getRecipes = async () => {
@@ -25,6 +32,7 @@ const RecipeBook = ({ route }) => {
       } else {
         setRecipes(recipes);
       }
+      setLoading(false);
     };
     if (isFocused) getRecipes();
   }, [author, user, isFocused]);
@@ -38,11 +46,19 @@ const RecipeBook = ({ route }) => {
         keyExtractor={(item) => item._id}
         numColumns={width > 600 ? 3 : 2}
         ListEmptyComponent={
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
-            <Text>You have no recipes yet.</Text>
-          </View>
+          loading ? (
+            <ActivityIndicator />
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text>You have no recipes yet.</Text>
+            </View>
+          )
         }
         style={{
           flex: 1,

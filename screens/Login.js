@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { ActivityIndicator, Text, Pressable, StyleSheet } from "react-native";
 import { Screen, Title, Message, AuthForm } from "../components";
 import { COLORS, SIZES, FONTS } from "../helpers/constants";
 import React, { useState } from "react";
@@ -8,7 +8,7 @@ import { setUser } from "../redux/userSlice";
 
 const Login = ({ navigation }) => {
   const dispatch = useDispatch();
-
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ error: false, msg: "" });
 
   const handleLoginPress = async (username, password) => {
@@ -18,10 +18,12 @@ const Login = ({ navigation }) => {
     } else if (!password || !password.length) {
       setMessage({ error: true, msg: "Password is required" });
     }
+    setLoading(true);
     const { token, user, error } = await logIn({ username, password });
     if (error) {
       console.log(error);
       setMessage({ error: true, msg: error });
+      setLoading(false);
       return;
     }
     dispatch(setUser({ token, ...user }));
@@ -33,13 +35,19 @@ const Login = ({ navigation }) => {
       {message.msg.length > 0 && (
         <Message error={message.error}>{message.msg}</Message>
       )}
-      <AuthForm isLogin={true} press={handleLoginPress} />
-      <Pressable onPress={() => navigation.navigate("signup")}>
-        <Text style={{ fontSize: SIZES.text }}>
-          Need an account?{" "}
-          <Text style={{ color: COLORS.primary }}>Sign Up</Text>
-        </Text>
-      </Pressable>
+      {loading ? (
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      ) : (
+        <>
+          <AuthForm isLogin={true} press={handleLoginPress} />
+          <Pressable onPress={() => navigation.navigate("signup")}>
+            <Text style={{ fontSize: SIZES.text }}>
+              Need an account?{" "}
+              <Text style={{ color: COLORS.primary }}>Sign Up</Text>
+            </Text>
+          </Pressable>
+        </>
+      )}
     </Screen>
   );
 };

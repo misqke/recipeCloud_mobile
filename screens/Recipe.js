@@ -216,10 +216,7 @@ const Recipe = ({ route, navigation }) => {
           ))}
           {showCommentBox ? (
             <View>
-              <CommentBox
-                closeBox={handleCloseCommentBox}
-                submit={handleAddComment}
-              />
+              <CommentBox submit={handleAddComment} />
             </View>
           ) : (
             <Pressable onPress={() => handleOpenCommentBox()}>
