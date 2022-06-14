@@ -51,7 +51,7 @@ const Comment = ({ comment, username, press, index }) => {
   );
 };
 
-const CommentBox = ({ closeBox, submit }) => {
+const CommentBox = ({ submit }) => {
   const [comment, setComment] = useState("");
   const inputRef = useRef(null);
 
@@ -66,7 +66,6 @@ const CommentBox = ({ closeBox, submit }) => {
         ref={inputRef}
         value={comment}
         onChangeText={(text) => setComment(text)}
-        onEndEditing={() => closeBox()}
         multiline={true}
         placeholder="write a comment"
         style={styles.commentInput}
@@ -94,10 +93,6 @@ const Recipe = ({ route, navigation }) => {
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const handleCloseCommentBox = () => {
-    setShowCommentBox(false);
   };
 
   const handleOpenCommentBox = () => {
