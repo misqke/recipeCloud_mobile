@@ -23,7 +23,7 @@ const RecipeBook = ({ route }) => {
           setRecipes([...recipes, ...data]);
         }
       } else {
-        setRecipes(bookRecipes);
+        setRecipes(recipes);
       }
     };
     if (isFocused) getRecipes();
@@ -49,7 +49,6 @@ const RecipeBook = ({ route }) => {
           width: "100%",
         }}
         contentContainerStyle={{
-          flex: 1,
           width: "100%",
         }}
         columnWrapperStyle={{
