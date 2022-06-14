@@ -12,6 +12,7 @@ const COLORS = {
   dark: "#343434",
   gray: "#767676",
   black: "#000",
+  red: "#f33",
 };
 
 const FONTS = {

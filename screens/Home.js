@@ -5,12 +5,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  useWindowDimensions,
 } from "react-native";
 import { Screen, RecipeCard, Title, Icon } from "../components";
 import React, { useState, useEffect, useRef } from "react";
 import { getRecipes } from "../helpers/controllers";
 import { COLORS, SIZES } from "../helpers/constants";
 import { useSelector } from "react-redux";
+import { useIsFocused } from "@react-navigation/native";
 
 const SearchBar = ({ func }) => {
   const [search, setSearch] = useState("");
@@ -56,11 +58,13 @@ const Pagination = ({ page, pages, press }) => {
 };
 
 const Home = () => {
+  const isFocused = useIsFocused();
   const listRef = useRef();
   const user = useSelector((state) => state.user);
   const [recipes, setRecipes] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
+  const { width, height } = useWindowDimensions();
 
   const handlePagePress = async (dir) => {
     if ((dir === 1 && page === pages) || (dir === -1 && page === 1)) return;
@@ -71,7 +75,7 @@ const Home = () => {
   };
 
   const handleSearch = async (search) => {
-    const data = await getRecipes(1, search);
+    const data = await getRecipes(1, search, width > 500 ? 12 : 8);
     setRecipes(data.recipes);
     setPage(1);
     setPages(data.pages);
@@ -79,12 +83,12 @@ const Home = () => {
 
   useEffect(() => {
     const getInitialRecipes = async () => {
-      const data = await getRecipes(1);
+      const data = await getRecipes(1, "", width > 500 ? 12 : 8);
       setRecipes(data.recipes);
       setPages(data.pages);
     };
-    getInitialRecipes();
-  }, []);
+    if (isFocused) getInitialRecipes();
+  }, [isFocused]);
 
   if (!recipes.length) {
     return (
@@ -104,21 +108,26 @@ const Home = () => {
       <Title>
         Welcome {user.username !== null ? `${user.username}` : "Guest"}
       </Title>
+      <SearchBar func={handleSearch} />
       <FlatList
         ref={listRef}
         data={recipes}
-        refreshing={false}
-        onRefresh={() => handleSearch()}
         renderItem={({ item }) => <RecipeCard recipe={item} />}
         keyExtractor={(item) => item._id}
-        numColumns={2}
-        ListHeaderComponent={<SearchBar func={handleSearch} />}
+        numColumns={width > 500 ? 3 : 2}
         ListFooterComponent={
           <Pagination page={page} pages={pages} press={handlePagePress} />
         }
         style={{
           flex: 1,
           width: "100%",
+        }}
+        contentContainerStyle={{
+          justifyContent: "space-between",
+          width: "100%",
+        }}
+        columnWrapperStyle={{
+          justifyContent: "center",
         }}
       />
     </Screen>
@@ -138,6 +147,7 @@ const styles = StyleSheet.create({
     width: "100%",
     alignItems: "center",
     position: "relative",
+    marginVertical: 10,
   },
   searchInput: {
     width: "80%",

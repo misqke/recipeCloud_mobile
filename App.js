@@ -7,6 +7,7 @@ import Recipe from "./screens/Recipe";
 import RecipeBook from "./screens/RecipeBook";
 import AddRecipe from "./screens/AddRecipe";
 import EditRecipe from "./screens/EditRecipe";
+import Signup from "./screens/Signup";
 import { SafeAreaView, StatusBar, ActivityIndicator } from "react-native";
 import { Nav } from "./components";
 import { COLORS } from "./helpers/constants";
@@ -63,7 +64,10 @@ const StackNav = () => {
                 <Stack.Screen name="editRecipe" component={EditRecipe} />
               </>
             ) : (
-              <Stack.Screen name="login" component={Login} />
+              <>
+                <Stack.Screen name="login" component={Login} />
+                <Stack.Screen name="signup" component={Signup} />
+              </>
             )}
           </Stack.Navigator>
           {user.username !== null && <Nav />}

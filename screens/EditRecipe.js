@@ -1,8 +1,9 @@
-import { View, Text } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Screen, RecipeForm, Title } from "../components";
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { updateRecipe } from "../helpers/controllers";
+import { COLORS, SIZES } from "../helpers/constants";
 
 const EditRecipe = ({ route, navigation }) => {
   const recipe = route.params;
@@ -28,3 +29,5 @@ const EditRecipe = ({ route, navigation }) => {
 };
 
 export default EditRecipe;
+
+const styles = StyleSheet.create({});

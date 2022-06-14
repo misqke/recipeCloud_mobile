@@ -9,10 +9,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  Switch,
+  Animated,
 } from "react-native";
 import Icon from "./Icon";
+import { useNavigation } from "@react-navigation/native";
 import { foodPlaceholder, COLORS, SIZES, FONTS } from "../helpers/constants";
+import { deleteRecipe } from "../helpers/controllers";
 import React, { useState, useRef, useEffect } from "react";
 import Message from "./Message";
 import * as ImagePicker from "expo-image-picker";
@@ -92,6 +94,7 @@ const IngredientInput = ({ ingredient, index, press, change }) => {
 };
 
 const RecipeForm = ({ recipe, submit }) => {
+  const navigation = useNavigation();
   const [message, setMessage] = useState({ error: false, msg: "" });
   const [name, setName] = useState(recipe?.name || "");
   const [time, setTime] = useState(recipe?.time || "");
@@ -108,8 +111,30 @@ const RecipeForm = ({ recipe, submit }) => {
   const [image, setImage] = useState(
     recipe?.image?.url || "/food-placeholder.png"
   );
-  const [share, setShare] = useState(Boolean(recipe?.share) || true);
+  const [share, setShare] = useState(
+    recipe?.share === undefined ? true : recipe.share
+  );
+  const [showDelete, setShowDelete] = useState(false);
+  const slideAnim = useRef(new Animated.Value(240)).current;
 
+  // animations
+  const slideUp = () => {
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const slideDown = () => {
+    Animated.timing(slideAnim, {
+      toValue: 240,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // submit and delete
   const handleSubmit = async () => {
     setMessage({ error: false, msg: "" });
     if (!name.length)
@@ -129,6 +154,15 @@ const RecipeForm = ({ recipe, submit }) => {
         directions,
         share,
       });
+  };
+
+  const handleDeleteRecipe = async () => {
+    const data = await deleteRecipe(recipe._id);
+    if (data.error) {
+      setMessage({ error: true, msg: data.error.message });
+    } else {
+      navigation.navigate("recipeBook", recipe.createdBy);
+    }
   };
 
   // scrolling for multiline input focus
@@ -185,20 +219,23 @@ const RecipeForm = ({ recipe, submit }) => {
     setDirections((prev) => [...prev, ""]);
   };
 
-  // share
-  const handleShareChange = () => {
-    setShare((prev) => !prev);
-  };
-
   useEffect(() => {
     setMessage({ error: false, msg: "" });
   }, [name, time, directions, ingredients]);
+
+  useEffect(() => {
+    if (showDelete) {
+      slideUp();
+    } else {
+      slideDown();
+    }
+  }, [showDelete]);
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={50}
-      style={{ flex: 1 }}
+      style={{ flex: 1, alignItems: "center" }}
     >
       {message.msg.length > 0 && (
         <Message error={message.error}>{message.msg}</Message>
@@ -269,19 +306,65 @@ const RecipeForm = ({ recipe, submit }) => {
           <FormButton press={handleAddDirection}>Add Direction</FormButton>
         </View>
         <View style={styles.row}>
-          <Text style={styles.selectorText}>Private</Text>
-          <Switch
-            style={styles.selector}
-            value={share}
-            onValueChange={() => handleShareChange()}
-            trackColor={{ false: COLORS.dark, true: COLORS.primary }}
-          />
-          <Text style={styles.selectorText}>Public</Text>
+          <Pressable
+            style={[
+              styles.btn,
+              { backgroundColor: share ? COLORS.primary : COLORS.dark },
+            ]}
+            onPress={() => setShare(true)}
+          >
+            <Text style={{ color: COLORS.white }}>Public</Text>
+          </Pressable>
+          <Pressable
+            style={[
+              styles.btn,
+              { backgroundColor: !share ? COLORS.primary : COLORS.dark },
+            ]}
+            onPress={() => setShare(false)}
+          >
+            <Text style={{ color: COLORS.white }}>Private</Text>
+          </Pressable>
         </View>
         <FormButton press={handleSubmit}>
           {recipe?.name ? "Update Recipe" : "Create Recipe"}
         </FormButton>
+        {recipe?.name && (
+          <Pressable
+            onPress={() => setShowDelete((prev) => !prev)}
+            style={[styles.btn, { backgroundColor: COLORS.red }]}
+          >
+            <Text style={{ color: COLORS.white }}>Delete Recipe</Text>
+          </Pressable>
+        )}
       </ScrollView>
+      <Animated.View
+        style={[
+          styles.confirmDelete,
+          { transform: [{ translateY: slideAnim }] },
+        ]}
+      >
+        <Text>Are you sure you want to delete?</Text>
+        <View style={[styles.row, { justifyContent: "center" }]}>
+          <Pressable
+            onPress={() => handleDeleteRecipe()}
+            style={[
+              styles.btn,
+              { backgroundColor: COLORS.red, alignSelf: "center" },
+            ]}
+          >
+            <Text style={{ color: COLORS.white }}>Delete</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setShowDelete((prev) => !prev)}
+            style={[
+              styles.btn,
+              { backgroundColor: COLORS.dark, alignSelf: "center" },
+            ]}
+          >
+            <Text style={{ color: COLORS.white }}>Cancel</Text>
+          </Pressable>
+        </View>
+      </Animated.View>
     </KeyboardAvoidingView>
   );
 };
@@ -291,7 +374,7 @@ export default RecipeForm;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // maxWidth: "100%",
+    position: "relative",
   },
   scrollContainer: {
     alignItems: "center",
@@ -356,10 +439,17 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
     width: "90%",
   },
-  selector: {
-    marginHorizontal: 5,
-  },
-  selectorText: {
-    fontSize: SIZES.text - 2,
+  confirmDelete: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: 220,
+    backgroundColor: COLORS.secondary,
+    borderTopWidth: 1,
+    borderColor: COLORS.dark,
+    borderStyle: "solid",
+    position: "absolute",
+    width: "100%",
+    bottom: 0,
+    borderRadius: 8,
   },
 });

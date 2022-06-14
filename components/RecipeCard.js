@@ -5,16 +5,18 @@ import {
   Image,
   ImageBackground,
   Pressable,
+  useWindowDimensions,
 } from "react-native";
 import { foodPlaceholder, COLORS, FONTS, SIZES } from "../helpers/constants";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 
 const RecipeCard = ({ recipe }) => {
+  const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
   return (
     <Pressable
-      style={styles.container}
+      style={[styles.container, { width: width > 600 ? "30%" : "45%" }]}
       onPress={() => navigation.navigate("recipe", recipe)}
     >
       <ImageBackground
@@ -39,7 +41,7 @@ export default RecipeCard;
 const styles = StyleSheet.create({
   container: {
     width: "45%",
-    marginHorizontal: "2.5%",
+    marginHorizontal: 10,
     height: 200,
     justifyContent: "center",
     alignItems: "center",
