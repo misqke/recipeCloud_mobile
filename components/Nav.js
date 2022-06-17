@@ -24,21 +24,25 @@ const Nav = () => {
         onPress={() => navigation.navigate("home")}
       >
         <Icon name="home" color={COLORS.secondary} size={SIZES.large} />
+        <Text style={styles.text}>Home</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.btn}
         onPress={() => navigation.navigate("recipeBook", user.username)}
       >
         <Icon name="book" color={COLORS.secondary} size={SIZES.large} />
+        <Text style={styles.text}>Recipe Book</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.btn}
         onPress={() => navigation.navigate("addRecipe")}
       >
         <Icon name="document" color={COLORS.secondary} size={SIZES.large} />
+        <Text style={styles.text}>Add Recipe</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.btn} onPress={() => handleLogoutPress()}>
         <Icon name="log-out" color={COLORS.secondary} size={SIZES.large} />
+        <Text style={styles.text}>Log Out</Text>
       </TouchableOpacity>
     </View>
   );
@@ -63,5 +67,10 @@ const styles = StyleSheet.create({
     shadowColor: COLORS.primary,
     shadowRadius: 5,
     shadowOpacity: 0.75,
+    alignItems: "center",
+  },
+  text: {
+    color: COLORS.secondary,
+    fontSize: SIZES.small,
   },
 });
